@@ -14,7 +14,7 @@ metadata:
 
 按顺序检查，不要在未确认工作空间时就开始改数据：
 
-1. `siyuan --version` — 输出应类似 `SiYuan Kernel v3.8.12`。报「找不到命令」说明 CLI 未安装或未加入 PATH，让用户先安装思源客户端（3.8+）并按插件提示把内核目录加入 PATH。
+1. `siyuan --version` — 输出应类似 `siyuan version 3.8.12`。报「找不到命令」说明 CLI 未安装或未加入 PATH，让用户先安装思源客户端（3.8+）并按插件提示把内核目录加入 PATH。
 2. `siyuan workspace list -f json` — 列出本机已注册的工作空间。只有一个且用户没有另行指定时可以直接用；有多个时必须让用户确认用哪个。
 3. `siyuan -w "<工作空间路径>" notebook list -f json` — 能列出笔记本才算连上。
 
