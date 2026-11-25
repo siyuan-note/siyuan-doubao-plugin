@@ -1,0 +1,41 @@
+{
+  "name": "siyuan",
+  "version": "1.0.0",
+  "displayName": {
+    "zh": "思源笔记",
+    "en": "SiYuan"
+  },
+  "description": {
+    "zh": "搜索、阅读、编写和整理思源笔记中的文档、内容块、笔记本与属性视图。",
+    "en": "Search, read, write and organize your SiYuan notes, documents, blocks and notebooks."
+  },
+  "icon": "com.doubao/assets/plugin-icon.png",
+  "author": {
+    "name": "SiYuan",
+    "url": "https://b3log.org/siyuan/"
+  },
+  "license": "AGPL-3.0",
+  "categories": [
+    "办公",
+    "知识管理"
+  ],
+  "platforms": [
+    "desktop",
+    "web",
+    "mobile"
+  ],
+  "keywords": [
+    "思源",
+    "思源笔记",
+    "SiYuan",
+    "笔记",
+    "知识库",
+    "文档"
+  ],
+  "examples": [
+    "在我思源笔记里搜索关于项目计划的文档",
+    "总结我思源笔记中最近更新的内容",
+    "在思源笔记中新建一篇会议纪要",
+    "把这周的想法整理成日记并打上标签"
+  ]
+}
