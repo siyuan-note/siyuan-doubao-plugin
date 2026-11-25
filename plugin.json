@@ -12,7 +12,8 @@
         "zh": "直接操作你本机的思源工作空间：搜索、阅读、编写和整理文档、内容块、笔记本、标签与日记，不需要 API token，也不经过云端中转。",
         "en": "Work directly on your local SiYuan workspace: search, read, write and organize documents, blocks, notebooks, tags and daily notes. No API token, no cloud relay."
       },
-      "icon": "./com.doubao/assets/plugin-icon.png"
+      "icon": "./com.doubao/assets/plugin-icon.png",
+      "privacyPolicyUrl": "https://github.com/siyuan-note/siyuan-doubao-plugin/blob/main/PRIVACY.md"
     }
   }
 }
