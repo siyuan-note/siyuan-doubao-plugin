@@ -3,16 +3,16 @@
     "siyuan": {
       "install": {
         "win32": [
-          "npm install -g @siyuan/cli"
+          "npm install -g @siyuan-note/cli"
         ],
         "darwin": [
-          "npm install -g @siyuan/cli"
+          "npm install -g @siyuan-note/cli"
         ],
         "linux": [
-          "npm install -g @siyuan/cli"
+          "npm install -g @siyuan-note/cli"
         ],
         "default": [
-          "npm install -g @siyuan/cli"
+          "npm install -g @siyuan-note/cli"
         ]
       },
       "status": {

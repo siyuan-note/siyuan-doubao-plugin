@@ -28,7 +28,7 @@ siyuan/
     └── smoke_test.py            # 零依赖的 CLI 自检
 ```
 
-`cli.json` 声明一个连接器 `siyuan`，安装命令为 `npm install -g @siyuan/cli`，状态命令为 `siyuan --version`，匹配正则 `siyuan version \d+\.\d+\.\d+`。连接器不声明 `auth`：思源内核 CLI 不需要任何凭据。
+`cli.json` 声明一个连接器 `siyuan`，安装命令为 `npm install -g @siyuan-note/cli`，状态命令为 `siyuan --version`，匹配正则 `siyuan version \d+\.\d+\.\d+`。连接器不声明 `auth`：思源内核 CLI 不需要任何凭据。
 
 ## 使用前提
 
@@ -69,9 +69,9 @@ python3 scripts/smoke_test.py --command "/path/to/SiYuan-Kernel"
 
 ## 上架阻塞项
 
-`@siyuan/cli` 这个 npm 包目前**不存在**，是方案里的待发布前置条件。豆包规定 Linux 下 `install` 只能使用 npm 全局安装命令，而思源原生 CLI 是随内核分发的二进制、不在 npm 上。要完成公开上架，需要思源官方发布一个 npm 包装包：
+`@siyuan-note/cli` 这个 npm 包目前**不存在**，是方案里的待发布前置条件。豆包规定 Linux 下 `install` 只能使用 npm 全局安装命令，而思源原生 CLI 是随内核分发的二进制、不在 npm 上。要完成公开上架，需要思源官方发布一个 npm 包装包：
 
-- 包名 `@siyuan/cli`，提供 `siyuan` 这个 bin
+- 包名 `@siyuan-note/cli`，提供 `siyuan` 这个 bin
 - 安装时定位本机已安装的思源内核二进制（`SiYuan-Kernel`），生成转发脚本；不要复制二进制，因为它依赖相邻的 `appearance/langs` 资源目录
 - Windows / macOS / Linux 都要能工作；未安装思源客户端时给出明确错误
 
