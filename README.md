@@ -1,36 +1,41 @@
 # 思源笔记 · 豆包插件
 
-让豆包通过 MCP 直接读写你的思源笔记：搜索、阅读、编写、整理。
+让豆包直接读写你本机的思源笔记：搜索、阅读、编写、整理。
 
-插件本体不保存笔记数据，也不打包任何凭据；所有读写都发生在你自己的思源内核上，token 由豆包保管，只发往你填写的思源地址。
+插件本体不保存笔记数据，也不打包任何凭据。所有读写都由思源内核自带的 `siyuan` CLI 在本地完成，直接操作工作空间里的 `.sy` 文件——不启动 HTTP 服务、不需要 API token、不经过任何云端中转。
 
-> 状态：开发中，尚未提交上架审核。
+> 状态：v1.1.0 已从 MCP 方案切换为 CLI 连接器。包结构与清单已按豆包插件协议对齐并通过本地校验；公开上架前仍有一个前置条件，见「上架阻塞项」。
+
+## 为什么从 MCP 换成 CLI
+
+豆包的 MCP 规范只接受公网可达的绝对 HTTPS 地址，明确禁止 `localhost` / `127.0.0.1` / `::1`，也不支持本地进程形式的 MCP。思源是本地优先的应用，内核默认监听 `127.0.0.1:6806`，两条要求天然冲突。
+
+CLI 连接器则是豆包为本地工具留的口子：命令通过客户端受控 Shell 在本机执行。思源 3.8+ 内核内置了完整的 CLI（`notebook` / `document` / `block` / `search` / `sql` / `export` 等），数据命令直接读写工作空间，全程不需要鉴权，正好符合 ISV 插件「CLI 不得使用 API Key」的规则。
 
 ## 插件包结构
 
 ```
 siyuan/
-├── plugin.json                  # 根清单：名称、版本、简介、图标、示例
+├── plugin.json                  # 根清单：名称、版本、简介、图标
 ├── skills/siyuan/
-│   ├── SKILL.md                 # 技能：触发条件、标准流程、写入规则
-│   └── references/tools.md      # 工具清单与常见坑
-├── mcp.json                     # MCP 服务声明，URL 与鉴权用 ${VAR} 模板
+│   ├── SKILL.md                 # 技能：连接确认、标准流程、写入规则
+│   └── references/tools.md      # CLI 命令清单与输出陷阱
 ├── com.doubao/
 │   ├── assets/plugin-icon.png   # 插件图标
-│   └── auth/siyuan.json         # 静态凭据表单：协议 / 主机 / 端口 / token
+│   └── cli.json                 # CLI 连接器：install / status / statusMatchRegex
 └── scripts/
     ├── build.py                 # 校验并打包到 dist/
-    └── smoke_test.py            # 零依赖的 MCP 握手自检
+    └── smoke_test.py            # 零依赖的 CLI 自检
 ```
 
-传输是 MCP Streamable HTTP，端点为 `{scheme}://{host}:{port}/mcp`，请求头 `Authorization: Token <API token>`。
+`cli.json` 声明一个连接器 `siyuan`，安装命令为 `npm install -g @siyuan/cli`，状态命令为 `siyuan --version`，匹配正则 `siyuan version \d+\.\d+\.\d+`。连接器不声明 `auth`：思源内核 CLI 不需要任何凭据。
 
 ## 使用前提
 
-- 思源 3.8.x 及以上，且内核正在运行
-- 豆包客户端，插件运行在「本地电脑」
-- 已在思源「设置 → 鉴权 → API token」取得 token
-- 当前工作空间的 MCP 能力开关已开启
+- 思源客户端 3.8+，且内核 CLI（`SiYuan-Kernel` / `siyuan`）在 PATH 中
+- Windows 安装器默认已把内核目录加入 PATH；macOS / Linux 需按思源文档建立软链
+- 豆包电脑版（CLI 连接器当前只在 PC 本地环境可用）
+- 工作空间已通过思源客户端创建过（`workspace list` 能列出）
 
 ## 构建
 
@@ -45,24 +50,41 @@ python3 scripts/build.py           # 校验并生成 dist/siyuan-plugin-<version
 
 ## 自检
 
-连接失败时先跑自检，它复现 `initialize` → `notifications/initialized` → `tools/list` 三步：
+连接失败时先跑自检，它复现豆包加载连接器时的三步检查：
 
 ```bash
-SIYUAN_API_TOKEN=xxxx python3 scripts/smoke_test.py
-python3 scripts/smoke_test.py --url https://siyuan.example.com --token xxxx --insecure
+python3 scripts/smoke_test.py
+python3 scripts/smoke_test.py --workspace "F:/SiYuan"
+python3 scripts/smoke_test.py --command "/path/to/SiYuan-Kernel"
 ```
 
-返回 `401` 是 token 不对，`403` 是 token 不是管理员 token，`tools 0 available` 是工作空间 MCP 能力开关被关掉。
+输出依次是 CLI 版本、注册的工作空间列表、实际选中的工作空间、笔记本数量。常见失败：
 
-## 待平台校验的字段
+- 找不到 `siyuan` 命令 → 内核目录未加入 PATH
+- `appearance files not found` → CLI 二进制与资源目录分离，改用客户端安装目录下的命令
+- `not a valid workspace` → 传错工作空间路径；用 `workspace list` 取真实路径
+- `0 notebooks` → 工作空间不对或尚未创建笔记本
 
-`what-is-plugin` 说明了包结构的模块划分，但 `plugin.json`、`mcp.json`、`com.doubao/auth/*.json` 的字段细节以「包构成与清单文件」为准。本仓库这三处按语义先写好，上架前需要和平台文档逐字段核对；校验逻辑集中在 `scripts/build.py`，改清单不必动技能。
+注意：默认工作空间是 `~/SiYuan`，但单次 CLI 命令不会读取注册列表。多工作空间时必须显式传 `-w`，不要依赖默认值。
+
+## 上架阻塞项
+
+`@siyuan/cli` 这个 npm 包目前**不存在**，是方案里的待发布前置条件。豆包规定 Linux 下 `install` 只能使用 npm 全局安装命令，而思源原生 CLI 是随内核分发的二进制、不在 npm 上。要完成公开上架，需要思源官方发布一个 npm 包装包：
+
+- 包名 `@siyuan/cli`，提供 `siyuan` 这个 bin
+- 安装时定位本机已安装的思源内核二进制（`SiYuan-Kernel`），生成转发脚本；不要复制二进制，因为它依赖相邻的 `appearance/langs` 资源目录
+- Windows / macOS / Linux 都要能工作；未安装思源客户端时给出明确错误
+
+如果不想发 npm 包，公开上架这条路在 Linux 上无法满足平台的 install 约束。
+
+其他已对齐项：插件包里没有 `mcp.json`、没有 `com.doubao/auth/`、没有静态凭据或真实 token；`plugin.json` 里也不再声明 `mcpServers`。这些约束都固化在 `scripts/build.py` 的校验里。
 
 ## 已知限制
 
-- 云电脑模式下 `127.0.0.1` 指向云主机，连不到用户本机的思源
-- 思源内核内置的 MCP 工具数量较多，模型存在选错工具的可能；技能里已做路由与坑位说明
-- 加密笔记本、只读模式、MCP 能力开关依然生效，与在思源里操作一致
+- CLI 连接器只在豆包电脑版可用，手机端和网页端无法使用本插件
+- 写操作没有交互确认，命令执行即落盘；Skill 要求先读后写、危险操作先征得用户确认，并用 `--dry-run` 预览
+- CLI 主动拒绝加密笔记本上的操作；SQL 强制只读
+- 写命令的输出格式不统一（`ok` / 纯 ID / `{"id": ...}`），Skill 已标注，避免误判为失败
 
 ## 许可证
 

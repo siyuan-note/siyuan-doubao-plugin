@@ -1,0 +1,35 @@
+{
+  "connectors": {
+    "siyuan": {
+      "install": {
+        "win32": [
+          "npm install -g @siyuan/cli"
+        ],
+        "darwin": [
+          "npm install -g @siyuan/cli"
+        ],
+        "linux": [
+          "npm install -g @siyuan/cli"
+        ],
+        "default": [
+          "npm install -g @siyuan/cli"
+        ]
+      },
+      "status": {
+        "win32": [
+          "siyuan --version"
+        ],
+        "darwin": [
+          "siyuan --version"
+        ],
+        "linux": [
+          "siyuan --version"
+        ],
+        "default": [
+          "siyuan --version"
+        ]
+      },
+      "statusMatchRegex": "siyuan version \\d+\\.\\d+\\.\\d+"
+    }
+  }
+}
