@@ -4,13 +4,7 @@
 
 插件本体不保存笔记数据，也不打包任何凭据。所有读写都由思源内核自带的 `siyuan` CLI 在本地完成，直接操作工作空间里的 `.sy` 文件——不启动 HTTP 服务、不需要 API token、不经过任何云端中转。
 
-> 状态：v1.1.0 已从 MCP 方案切换为 CLI 连接器，并已提交豆包公开插件审核（2026-11-25），当前状态为「审核中」，等待平台审核结果。
-
-## 为什么从 MCP 换成 CLI
-
-豆包的 MCP 规范只接受公网可达的绝对 HTTPS 地址，明确禁止 `localhost` / `127.0.0.1` / `::1`，也不支持本地进程形式的 MCP。思源是本地优先的应用，内核默认监听 `127.0.0.1:6806`，两条要求天然冲突。
-
-CLI 连接器则是豆包为本地工具留的口子：命令通过客户端受控 Shell 在本机执行。思源 3.8+ 内核内置了完整的 CLI（`notebook` / `document` / `block` / `search` / `sql` / `export` 等），数据命令直接读写工作空间，全程不需要鉴权，正好符合 ISV 插件「CLI 不得使用 API Key」的规则。
+> 状态：v1.1.0 已提交豆包公开插件审核（2026-11-25），当前为「审核中」，等待平台审核结果。
 
 ## 插件包结构
 
@@ -66,20 +60,6 @@ python3 scripts/smoke_test.py --command "/path/to/SiYuan-Kernel"
 - `0 notebooks` → 工作空间不对或尚未创建笔记本
 
 注意：默认工作空间是 `~/SiYuan`，但单次 CLI 命令不会读取注册列表。多工作空间时必须显式传 `-w`，不要依赖默认值。
-
-## 发布前置条件（已完成）
-
-豆包规定 Linux 下 `install` 只能使用 npm 全局安装命令，而思源原生 CLI 是随内核分发的二进制、不在 npm 上。为此思源官方已在主库 `scripts/npm-cli/` 发布包装包 **`@siyuan-note/cli`**（当前 latest `0.1.1`，通过 GitHub Actions Trusted Publishing 发布），提供 `siyuan` 这个 bin：
-
-- 安装时定位本机已安装的思源内核二进制（`SiYuan-Kernel`），生成转发脚本；不复制二进制，因为它依赖相邻的 `appearance/langs` 资源目录
-- Windows / macOS / Linux 均可工作；未安装思源客户端时给出明确错误
-- 可用 `SIYUAN_CLI_BIN` 环境变量显式指定内核可执行文件
-
-因此 `cli.json` 中的安装命令 `npm install -g @siyuan-note/cli` 满足平台要求；发布流程见主库 `scripts/npm-cli/README.md`。
-
-隐私政策链接写在 `plugin.json` 的 `extensions["com.doubao"].privacyPolicyUrl`，指向思源官方隐私政策 `https://b3log.org/siyuan/privacy.html`；这是提交审核时平台校验的必填项。
-
-其他已对齐项：插件包里没有 `mcp.json`、没有 `com.doubao/auth/`、没有静态凭据或真实 token；`plugin.json` 里也不再声明 `mcpServers`。这些约束都固化在 `scripts/build.py` 的校验里。
 
 ## 已知限制
 
