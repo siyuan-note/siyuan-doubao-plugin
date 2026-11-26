@@ -7,7 +7,8 @@
 - 技能改为思源 3.8 内核 CLI 命令用法，附真实命令清单与输出陷阱（写命令返回 `ok` / 纯 ID）
 - 状态匹配正则按实测输出修正为 `siyuan version \d+\.\d+\.\d+`
 - 构建校验改为检查 CLI 清单、禁止 MCP 与静态凭据残留；自检改为复现 CLI 三步检查
-- README 写明 `@siyuan-note/cli` npm 包装包是公开上架的前置条件
+- README 写明 `@siyuan-note/cli` npm 包装包是公开上架的前置条件；该包已发布（latest 0.1.1），插件已提交审核
+- 补充 `privacyPolicyUrl`，指向思源官方隐私政策 `https://b3log.org/siyuan/privacy.html`，满足平台提交校验
 
 ## 1.0.0 — 2026-11-25
 

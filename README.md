@@ -4,7 +4,7 @@
 
 插件本体不保存笔记数据，也不打包任何凭据。所有读写都由思源内核自带的 `siyuan` CLI 在本地完成，直接操作工作空间里的 `.sy` 文件——不启动 HTTP 服务、不需要 API token、不经过任何云端中转。
 
-> 状态：v1.1.0 已从 MCP 方案切换为 CLI 连接器。包结构与清单已按豆包插件协议对齐并通过本地校验；公开上架前仍有一个前置条件，见「上架阻塞项」。
+> 状态：v1.1.0 已从 MCP 方案切换为 CLI 连接器，并已提交豆包公开插件审核（2026-11-25），当前状态为「审核中」，等待平台审核结果。
 
 ## 为什么从 MCP 换成 CLI
 
@@ -32,8 +32,8 @@ siyuan/
 
 ## 使用前提
 
-- 思源客户端 3.8+，且内核 CLI（`SiYuan-Kernel` / `siyuan`）在 PATH 中
-- Windows 安装器默认已把内核目录加入 PATH；macOS / Linux 需按思源文档建立软链
+- 思源客户端 3.8+；`@siyuan-note/cli` 会自动定位内核，也可通过 `SIYUAN_CLI_BIN` 指定
+- Windows 安装器默认已把内核目录加入 PATH；macOS / Linux 必要时按思源文档建立软链
 - 豆包电脑版（CLI 连接器当前只在 PC 本地环境可用）
 - 工作空间已通过思源客户端创建过（`workspace list` 能列出）
 
@@ -67,15 +67,17 @@ python3 scripts/smoke_test.py --command "/path/to/SiYuan-Kernel"
 
 注意：默认工作空间是 `~/SiYuan`，但单次 CLI 命令不会读取注册列表。多工作空间时必须显式传 `-w`，不要依赖默认值。
 
-## 上架阻塞项
+## 发布前置条件（已完成）
 
-`@siyuan-note/cli` 这个 npm 包目前**不存在**，是方案里的待发布前置条件。豆包规定 Linux 下 `install` 只能使用 npm 全局安装命令，而思源原生 CLI 是随内核分发的二进制、不在 npm 上。要完成公开上架，需要思源官方发布一个 npm 包装包：
+豆包规定 Linux 下 `install` 只能使用 npm 全局安装命令，而思源原生 CLI 是随内核分发的二进制、不在 npm 上。为此思源官方已在主库 `scripts/npm-cli/` 发布包装包 **`@siyuan-note/cli`**（当前 latest `0.1.1`，通过 GitHub Actions Trusted Publishing 发布），提供 `siyuan` 这个 bin：
 
-- 包名 `@siyuan-note/cli`，提供 `siyuan` 这个 bin
-- 安装时定位本机已安装的思源内核二进制（`SiYuan-Kernel`），生成转发脚本；不要复制二进制，因为它依赖相邻的 `appearance/langs` 资源目录
-- Windows / macOS / Linux 都要能工作；未安装思源客户端时给出明确错误
+- 安装时定位本机已安装的思源内核二进制（`SiYuan-Kernel`），生成转发脚本；不复制二进制，因为它依赖相邻的 `appearance/langs` 资源目录
+- Windows / macOS / Linux 均可工作；未安装思源客户端时给出明确错误
+- 可用 `SIYUAN_CLI_BIN` 环境变量显式指定内核可执行文件
 
-如果不想发 npm 包，公开上架这条路在 Linux 上无法满足平台的 install 约束。
+因此 `cli.json` 中的安装命令 `npm install -g @siyuan-note/cli` 满足平台要求；发布流程见主库 `scripts/npm-cli/README.md`。
+
+隐私政策链接写在 `plugin.json` 的 `extensions["com.doubao"].privacyPolicyUrl`，指向思源官方隐私政策 `https://b3log.org/siyuan/privacy.html`；这是提交审核时平台校验的必填项。
 
 其他已对齐项：插件包里没有 `mcp.json`、没有 `com.doubao/auth/`、没有静态凭据或真实 token；`plugin.json` 里也不再声明 `mcpServers`。这些约束都固化在 `scripts/build.py` 的校验里。
 
